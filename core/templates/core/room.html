@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Streaming Room</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-slate-200 flex flex-col min-h-screen">
+
+    <!-- Header -->
+    <header class="bg-gray-800 shadow-lg z-10">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center">
+                    <span class="font-semibold text-lg text-white">Room Code:</span>
+                    <strong id="roomCode" class="ml-2 text-lg bg-gray-700 text-green-400 px-3 py-1 rounded-md tracking-wider"></strong>
+                </div>
+                <div class="flex items-center space-x-2 sm:space-x-4">
+                    <button id="btnMic" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg flex items-center transition duration-300 ease-in-out transform hover:scale-105">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path></svg>
+                        <span>Mute</span>
+                    </button>
+                    <label for="fileInput" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg cursor-pointer flex items-center transition duration-300 ease-in-out transform hover:scale-105">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                        <span>Stream Video File</span>
+                    </label>
+                    <input type="file" id="fileInput" class="hidden" accept="video/*">
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-8 flex items-center justify-center">
+        <div class="w-full max-w-6xl aspect-video bg-black rounded-2xl shadow-2xl overflow-hidden relative">
+            <video id="videoPlayer" class="w-full h-full object-contain" autoplay playsinline muted></video>
+            <div id="placeholder" class="absolute inset-0 flex items-center justify-center text-gray-500 text-2xl">
+                <p>Select a video file to start streaming...</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Hidden video element for file streaming. -->
+    <video id="fileStreamer" class="hidden"></video> 
+    <!-- playsinline loop style="volume:0;" -->
+    
+    <!-- Container for remote audio streams -->
+    <div id="audioContainer"></div>
+
+    <script>
+    (async function() {
+        // --- DOM Elements ---
+        const roomCodeDisplay = document.getElementById('roomCode');
+        const btnMic = document.getElementById('btnMic');
+        const fileInput = document.getElementById('fileInput');
+        const videoPlayer = document.getElementById('videoPlayer');
+        const fileStreamer = document.getElementById('fileStreamer');
+        const placeholder = document.getElementById('placeholder');
+        const audioContainer = document.getElementById('audioContainer');
+
+        // --- State ---
+        let localVideoStream = null;
+        let localAudioStream = null;
+        let micMuted = false;
+        const peerConnections = {};
+        const roomName = generateRoomName();
+        // getRoomNameFromURL() || 
+        roomCodeDisplay.textContent = roomName;
+
+        // --- Get User's Microphone ---
+        try {
+            localAudioStream = await navigator.mediaDevices.getUserMedia({
+                video: {
+                    width: { ideal: 1280 },
+                    height: { ideal: 720 },
+                    frameRate: { ideal: 30 }
+                },
+                audio: true
+            });
+        } catch (err) {
+            console.error("Microphone access denied.", err);
+            // Non-fatal, streamer might not want to talk.
+        }
+
+        // --- WebSocket for Signaling ---
+        const wsProtocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
+        const ws = new WebSocket(`${wsProtocol}${window.location.host}/ws/signaling/${roomName}/`);
+
+        // --- WebRTC Configuration ---
+        const configuration = {
+            iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]
+        };
+
+        // --- Helper Functions ---
+        // function getRoomNameFromURL() {
+        //    const path = window.location.pathname.split('/');
+        //    if (path.length > 2 && path[path.length - 2] !== "") return path[path.length - 2];
+        //    return null;
+        //}
+
+        function generateRoomName() {
+            const newRoom = Math.random().toString(36).substring(2, 8);
+            window.history.pushState({}, '', `/room/${newRoom}/`);
+            return newRoom;
+        }
+
+        function hidePlaceholder() {
+            placeholder.style.display = 'none';
+        }
+
+        // --- WebRTC Logic ---
+        function createPeerConnection(peerId, isInitiator) {
+            console.log(`Creating peer connection for ${peerId}, initiator: ${isInitiator}`);
+            const pc = new RTCPeerConnection(configuration);
+            peerConnections[peerId] = pc;
+
+            // Add local audio and video streams if they exist
+            if (localAudioStream) localAudioStream.getTracks().forEach(track => pc.addTrack(track, localAudioStream));
+            if (localVideoStream) localVideoStream.getTracks().forEach(track => pc.addTrack(track, localVideoStream));
+
+            if (isInitiator) {
+                pc.createOffer()
+                    .then(offer => pc.setLocalDescription(offer))
+                    .then(() => {
+                        ws.send(JSON.stringify({ type: 'offer', target: peerId, offer: pc.localDescription }));
+                    });
+            }
+
+            pc.onicecandidate = (event) => {
+                if (event.candidate) {
+                    ws.send(JSON.stringify({ type: 'candidate', target: peerId, candidate: event.candidate }));
+                }
+            };
+
+            pc.ontrack = (event) => {
+                // The streamer only receives audio tracks from viewers
+                if (event.track.kind === 'audio') {
+                    console.log(`Received audio track from ${peerId}`);
+                    let audioEl = document.getElementById(`audio-${peerId}`);
+                    if (!audioEl) {
+                        audioEl = document.createElement('audio');
+                        audioEl.id = `audio-${peerId}`;
+                        audioEl.autoplay = true;
+                        audioContainer.appendChild(audioEl);
+                    }
+                    audioEl.srcObject = event.streams[0];
+                }
+            };
+
+            return pc;
+        }
+
+        // --- WebSocket Event Handlers ---
+        ws.onopen = () => console.log('WebSocket connection established.');
+        ws.onmessage = async (event) => {
+            const data = JSON.parse(event.data);
+            const peerId = data.sender;
+            if (!peerId) return;
+            console.log(`Received message: ${data.type} from ${peerId}`);
+
+            let pc = peerConnections[peerId];
+
+            switch (data.type) {
+                case 'join':
+                    createPeerConnection(peerId, true);
+                    break;
+                case 'answer':
+                    if (pc) await pc.setRemoteDescription(new RTCSessionDescription(data.answer));
+                    break;
+                case 'candidate':
+                    if (pc && data.candidate && pc.remoteDescription) {
+                        await pc.addIceCandidate(new RTCIceCandidate(data.candidate));
+                    }
+                    break;
+            }
+        };
+
+        // --- Controls ---
+        btnMic.addEventListener('click', () => {
+            if (!localAudioStream) return;
+            micMuted = !micMuted;
+            localAudioStream.getAudioTracks().forEach(track => track.enabled = !micMuted);
+            // UI update logic...
+        });
+
+        fileInput.addEventListener('change', async (event) => {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const url = URL.createObjectURL(file);
+            fileStreamer.src = url;
+            fileStreamer.volume = 1; // Set volume to 0 to include audio track
+
+            try {
+                await fileStreamer.play();
+                const stream = fileStreamer.captureStream ? fileStreamer.captureStream() : fileStreamer.mozCaptureStream();
+                videoPlayer.srcObject = stream;
+                hidePlaceholder();
+                localVideoStream = stream;
+
+                // Add/replace video tracks for all existing connections
+                for (const peerId in peerConnections) {
+                    const pc = peerConnections[peerId];
+                    stream.getTracks().forEach(track => {
+                        const sender = pc.getSenders().find(s => s.track && s.track.kind === track.kind);
+                        if (sender) {
+                            sender.replaceTrack(track);
+                        } else {
+                            pc.ontrack = (event) => {
+                            const remoteStream = event.streams[0];
+                            videoElement.srcObject = remoteStream;
+                            };
+                        }
+                    });
+                }
+            } catch (error) {
+                console.error("Error playing video file:", error);
+            }
+        });
+    })();
+    </script>
+
+</body>
+</html>
