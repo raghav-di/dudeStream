@@ -106,7 +106,7 @@
         //}
 
         function generateRoomName() {
-            const newRoom = Math.random().toString(36).substring(2, 8);
+            const newRoom = [...Array(16)].map(() => (Math.random() * 62 | 0).toString(36)).map(c => Math.random() < 0.5 ? c : c.toUpperCase()).join('');
             window.history.pushState({}, '', `/room/${newRoom}/`);
             return newRoom;
         }
