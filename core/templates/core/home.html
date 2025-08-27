@@ -5,8 +5,130 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CollabView - Home</title>
-    <link rel="stylesheet" href="{% static 'home.css' %}">
 </head>
+<style>
+    /* General Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background: #f9f9f9;
+    color: #333;
+    line-height: 1.6;
+}
+
+/* Header */
+header {
+    background: #2b2d42;
+    color: #fff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 40px;
+}
+
+header .logo {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+header nav a {
+    color: #fff;
+    margin-left: 20px;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+header nav a:hover {
+    color: #fca311;
+}
+
+/* Hero Section */
+.hero {
+    text-align: center;
+    padding: 80px 20px;
+    background: linear-gradient(135deg, #fca311, #ffbe0b);
+    color: #fff;
+}
+
+.hero h1 {
+    font-size: 2.5rem;
+    margin-bottom: 15px;
+}
+
+.hero p {
+    font-size: 1.1rem;
+    margin-bottom: 30px;
+}
+
+.buttons .btn {
+    display: inline-block;
+    padding: 12px 25px;
+    margin: 10px;
+    background: #2b2d42;
+    color: #fff;
+    border-radius: 6px;
+    text-decoration: none;
+    transition: background 0.3s;
+}
+
+.buttons .btn.secondary {
+    background: #14213d;
+}
+
+.buttons .btn:hover {
+    background: #1d1f2e;
+}
+
+.buttons .btn p {
+    font-size: 18px;
+}
+
+#join-room-button {
+    padding: 12px 25px;
+    margin: 10px;
+    background: #2b2d42;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+#join-room-button:hover {
+    background: #1d1f2e;
+}
+
+#join-room-button p {
+    font-size: 21px;
+}
+
+#room-code-input {
+    padding: 10px;
+    width: 250px;
+    border: 2px solid #ccc;
+    border-radius: 6px;
+    font-size: 16px;
+    margin-bottom: 20px;
+}
+
+/* Footer */
+footer {
+    position: static;
+    bottom: 0;
+    width: 100%;
+    text-align: center;
+    padding: 15px;
+    background: #2b2d42;
+    color: #fff;
+    margin-top: 50px;
+}
+
+</style>
 <body>
     <header>
         <div class="logo">CollabView</div>
@@ -20,9 +142,10 @@
     <section class="hero">
         <h1>Share & View Images Together</h1>
         <p>Invite friends to a room, share an image, and collaborate in real-time.</p>
+            <input type="text" id="room-code-input" placeholder="Enter Room Code">
         <div class="buttons">
-            <a href="#" class="btn">Create Room</a>
-            <a href="#" class="btn secondary">Join Room</a>
+            <a href="{%url 'core:create'%}" class="btn"><p>Create Room</p></a>
+            <button id="join-room-button"><p>Join Room</p></button>
         </div>
     </section>
 
@@ -30,4 +153,22 @@
         <p>© 2025 CollabView. All rights reserved.</p>
     </footer>
 </body>
+<script>
+    // Get the input field and the button
+    const roomCodeInput = document.getElementById('room-code-input');
+    const joinButton = document.getElementById('join-room-button');
+
+    // Add an event listener for when the button is clicked
+    joinButton.addEventListener('click', () => {
+        const roomName = roomCodeInput.value;
+
+        // Check if the user actually typed something
+        if (roomName) {
+            // Redirect the user to the correct join room URL
+            window.location.href = `/join_room/${roomName}/`;
+        } else {
+            alert("Please enter a room code.");
+        }
+    });
+</script>
 </html>
