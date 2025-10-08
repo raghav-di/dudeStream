@@ -98,13 +98,6 @@
             iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]
         };
 
-        // --- Helper Functions ---
-        // function getRoomNameFromURL() {
-        //    const path = window.location.pathname.split('/');
-        //    if (path.length > 2 && path[path.length - 2] !== "") return path[path.length - 2];
-        //    return null;
-        //}
-
         function generateRoomName() {
             const newRoom = [...Array(16)].map(() => (Math.random() * 62 | 0).toString(36)).map(c => Math.random() < 0.5 ? c : c.toUpperCase()).join('');
             window.history.pushState({}, '', `/room/${newRoom}/`);
@@ -190,6 +183,15 @@
             // UI update logic...
         });
 
+        videoPlayer.onplay = () => {
+            ws.send(JSON.stringify({ type: 'play' }));
+            fileStreamer.play();
+        };
+        videoPlayer.onpause = () => {
+            ws.send(JSON.stringify({ type: 'pause' }));
+            fileStreamer.pause();
+        };
+        
         fileInput.addEventListener('change', async (event) => {
             const file = event.target.files[0];
             if (!file) return;
@@ -211,6 +213,10 @@
                     stream.getTracks().forEach(track => {
                         const sender = pc.getSenders().find(s => s.track && s.track.kind === track.kind);
                         if (sender) {
+                            const params = sender.getParameters();
+                            if (!params.encodings) params.encodings = [{}];
+                            params.encodings[0].maxBitrate = 1500000; // 1.5 Mbps
+                            sender.setParameters(params);
                             sender.replaceTrack(track);
                         } else {
                             pc.ontrack = (event) => {
