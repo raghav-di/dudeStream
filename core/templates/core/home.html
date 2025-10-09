@@ -30,6 +30,7 @@ header {
     justify-content: space-between;
     align-items: center;
     padding: 15px 40px;
+    height: 70px;
 }
 
 header .logo {
@@ -54,7 +55,7 @@ header nav a:hover {
     padding: 80px 20px;
     background: linear-gradient(135deg, #7ffc11c6, #ffbe0b9e,rgba(47, 0, 255, 0.84));
     color: #fff;
-    height: 80vh;
+    min-height: calc(100vh - 130px);
 }
 
 .hero h1 {
@@ -67,15 +68,17 @@ header nav a:hover {
     margin-bottom: 30px;
 }
 
-.buttons .btn {
+.btn {
     display: inline-block;
-    padding: 12px 25px;
-    margin: 10px;
+    margin: 4px;
     background: #2b2d42;
     color: #fff;
     border-radius: 6px;
     text-decoration: none;
     transition: background 0.3s;
+    padding: 10px;
+    width: 320px;
+    height: 50px;
 }
 
 .buttons .btn.secondary {
@@ -86,36 +89,107 @@ header nav a:hover {
     background: #1d1f2e;
 }
 
-.buttons .btn p {
-    font-size: 18px;
-}
-
-#join-room-button {
-    padding: 12px 25px;
-    margin: 10px;
-    background: #2b2d42;
-    color: #fff;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: background 0.3s;
-}
-
-#join-room-button:hover {
+.btn:hover {
     background: #1d1f2e;
 }
 
-#join-room-button p {
+.btn p {
     font-size: 21px;
 }
 
-#room-code-input {
-    padding: 10px;
-    width: 250px;
-    border: 2px solid #ccc;
-    border-radius: 6px;
-    font-size: 16px;
-    margin-bottom: 20px;
+#room-code-input{
+  width: 320px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 4px solid transparent;
+  background-origin: padding-box, border-box;
+  background-clip: padding-box, border-box;
+  background-image:
+    linear-gradient(#ffffff, #ffffff),
+    conic-gradient(from 0deg, #2ecc71, #f1c40f, #3498db, #2ecc71);
+  /* animate the conic by rotating the element that only contains the border using CSS variable */
+  transition: box-shadow 160ms ease, transform 160ms ease;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  font-size: 16px;
+}
+
+/* faux-rotation via background-position (limited) */
+@keyframes wobble {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+#room-code-input{
+  background-size: 200% 200%, 200% 200%;
+  animation: wobble 6s linear infinite;
+}
+
+/* focus glow: stop wobble visually and add glow */
+#room-code-input:focus{
+  animation-play-state: paused;
+  box-shadow:
+    0 8px 30px rgba(46,204,113,0.18),
+    0 0 22px rgba(52,152,219,0.18);
+  transform: translateY(-1px);
+  outline: none;
+}
+
+.rotating-border {
+  position: relative;
+  display: inline-block;
+  padding: 4px; /* border thickness */
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.rotating-border::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 4px;
+  background: conic-gradient(
+    from 0deg,
+    #2ecc71,
+    #f1c40f,
+    #3498db,
+    #2ecc71
+  );
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: spin 3s linear infinite;
+  z-index: 0;
+}
+
+.rotating-border input#room-code-input {
+  position: relative;
+  z-index: 1;
+  width: 320px;
+  padding: 12px 14px;
+  border: none;
+  outline: none;
+  border-radius: 8px;
+  background: #fff;
+  font-size: 16px;
+  transition: box-shadow 0.25s ease;
+}
+
+/* Glowing focus effect */
+.rotating-border:focus-within::before {
+  filter: brightness(1.3) blur(4px);
+  animation-play-state: paused; /* pause rotation while glowing */
+}
+
+.rotating-border input#room-code-input:focus {
+  box-shadow: 0 0 15px 4px rgba(46, 204, 113, 0.4),
+              0 0 25px 8px rgba(52, 152, 219, 0.2);
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
 }
 
 /* Footer */
@@ -125,6 +199,7 @@ footer {
     width: 100%;
     text-align: center;
     padding: 15px;
+    height: 60px;
     background: #2b2d42;
     color: #fff;
 }
@@ -132,7 +207,7 @@ footer {
 </style>
 <body>
     <header>
-        <div class="logo">CollabView</div>
+        <div class="logo">DudeStream</div>
         <nav>
             <a href="#">Home</a>
             <a href="#">Login</a>
@@ -143,10 +218,18 @@ footer {
     <section class="hero">
         <h1>Share & View Stream Together</h1>
         <p>Invite friends to a room, share an image, and collaborate in real-time.</p>
-            <input type="text" id="room-code-input" placeholder="Enter Room Code">
+            <!-- <input type="text" id="room-code-input" placeholder="Enter Room Code"> -->
+             
         <div class="buttons">
-            <a href="{%url 'core:create'%}" class="btn"><p>Create Room</p></a>
-            <button id="join-room-button"><p>Join Room</p></button>
+            <button class="btn" id="create-room-button"><p>Create Room</p></button>
+            <!-- <br> -->
+            <p>---------------------------------------------</p>
+            <div class="rotating-border">
+                <input id="room-code-input" type="text" placeholder="Enter room code" />
+            </div>
+             <br>
+            <!-- <a href="{%url 'core:create'%}" class="btn"></a> -->
+            <button class="btn" id="join-room-button"><p>Join Room</p></button>
         </div>
     </section>
 
@@ -158,7 +241,13 @@ footer {
     // Get the input field and the button
     const roomCodeInput = document.getElementById('room-code-input');
     const joinButton = document.getElementById('join-room-button');
+    const createButton = document.getElementById('create-room-button');
 
+    // Add an event listener for when the create button is clicked
+    createButton.addEventListener('click', () => {
+        // Redirect the user to the create room URL
+        window.location.href = `/room/`;
+    });
     // Add an event listener for when the button is clicked
     joinButton.addEventListener('click', () => {
         const roomName = roomCodeInput.value;
