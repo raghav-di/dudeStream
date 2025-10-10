@@ -2,263 +2,299 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" href="{% static 'favicon.ico' %}" type="image/x-icon">
-    <title>CollabView - Home</title>
-</head>
-<style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" href="{% static 'favicon.ico' %}" type="image/x-icon" />
+  <title>CollabView - Home</title>
+  <style>
     /* General Reset */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    body { background: #f9f9f9; color: #333; line-height: 1.6; }
 
-body {
-    background: #f9f9f9;
-    color: #333;
-    line-height: 1.6;
-}
+    /* Header */
+    header {
+      background: #2b2d42; color: #fff;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 15px 40px; height: 70px; position: relative;
+    }
+    header .logo { font-size: 1.5rem; font-weight: bold; }
+    header nav button {
+      background: #fca311; color: #2b2d42;
+      border: none; margin-left: 10px; padding: 8px 14px;
+      border-radius: 6px; font-weight: bold; cursor: pointer;
+      transition: background 0.3s;
+    }
+    header nav button:hover { background: #ffd166; }
 
-/* Header */
-header {
-    background: #2b2d42;
-    color: #fff;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 15px 40px;
-    height: 70px;
-}
+    /* Profile Image + Dropdown */
+    #profile-img {
+      width: 42px; height: 42px; border-radius: 50%; border: 2px solid #fff;
+      display: none; cursor: pointer; transition: transform 0.2s ease;
+    }
+    #profile-img:hover { transform: scale(1.1); }
 
-header .logo {
-    font-size: 1.5rem;
-    font-weight: bold;
-}
+    #profile-menu {
+      position: absolute; top: 65px; right: 40px;
+      background: #fff; border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+      display: none; flex-direction: column; width: 160px; overflow: hidden;
+      animation: fadeIn 0.2s ease-in-out;
+    }
+    #profile-menu.show { display: flex; }
+    #profile-menu p {
+      margin: 0; padding: 12px 16px;
+      border-bottom: 1px solid #eee; color: #333;
+    }
+    #profile-menu button {
+      background: none; border: none; color: #2b2d42;
+      padding: 12px 16px; text-align: left; cursor: pointer;
+      transition: background 0.2s;
+    }
+    #profile-menu button:hover { background: #f2f2f2; }
 
-header nav a {
-    color: #fff;
-    margin-left: 20px;
-    text-decoration: none;
-    transition: color 0.3s;
-}
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-5px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
 
-header nav a:hover {
-    color: #fca311;
-}
+    /* Hero */
+    .hero {
+      text-align: center; padding: 80px 20px;
+      background: linear-gradient(135deg, #7ffc11c6, #ffbe0b9e, rgba(47, 0, 255, 0.84));
+      color: #fff; min-height: calc(100vh - 130px);
+    }
+    .hero h1 { font-size: 2.5rem; margin-bottom: 15px; }
+    .hero p { font-size: 1.1rem; margin-bottom: 30px; }
 
-/* Hero Section */
-.hero {
-    text-align: center;
-    padding: 80px 20px;
-    background: linear-gradient(135deg, #7ffc11c6, #ffbe0b9e,rgba(47, 0, 255, 0.84));
-    color: #fff;
-    min-height: calc(100vh - 130px);
-}
+    .btn {
+      display: inline-block; margin: 4px;
+      background: #2b2d42; color: #fff;
+      border-radius: 6px; text-decoration: none;
+      transition: background 0.3s; padding: 10px;
+      width: 320px; height: 50px; cursor: pointer;
+    }
+    .btn:hover { background: #1d1f2e; }
+    .btn p { font-size: 21px; }
 
-.hero h1 {
-    font-size: 2.5rem;
-    margin-bottom: 15px;
-}
+    .rotating-border {
+      position: relative; display: inline-block; padding: 4px;
+      border-radius: 12px; overflow: hidden;
+    }
+    .rotating-border::before {
+      content: ""; position: absolute; inset: 0; border-radius: inherit; padding: 4px;
+      background: conic-gradient(from 0deg, #2ecc71, #f1c40f, #3498db, #2ecc71);
+      mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+      -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+      -webkit-mask-composite: xor; mask-composite: exclude;
+      animation: spin 3s linear infinite; z-index: 0;
+    }
+    .rotating-border input#room-code-input {
+      position: relative; z-index: 1;
+      width: 320px; padding: 12px 14px;
+      border: none; outline: none;
+      border-radius: 8px; background: #fff;
+      font-size: 16px; transition: box-shadow 0.25s ease;
+    }
+    @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
-.hero p {
-    font-size: 1.1rem;
-    margin-bottom: 30px;
-}
+    /* Footer */
+    footer {
+      text-align: center; padding: 15px;
+      background: #2b2d42; color: #fff;
+    }
 
-.btn {
-    display: inline-block;
-    margin: 4px;
-    background: #2b2d42;
-    color: #fff;
-    border-radius: 6px;
-    text-decoration: none;
-    transition: background 0.3s;
-    padding: 10px;
-    width: 320px;
-    height: 50px;
-}
-
-.buttons .btn.secondary {
-    background: #14213d;
-}
-
-.buttons .btn:hover {
-    background: #1d1f2e;
-}
-
-.btn:hover {
-    background: #1d1f2e;
-}
-
-.btn p {
-    font-size: 21px;
-}
-
-#room-code-input{
-  width: 320px;
-  padding: 12px 14px;
-  border-radius: 10px;
-  border: 4px solid transparent;
-  background-origin: padding-box, border-box;
-  background-clip: padding-box, border-box;
-  background-image:
-    linear-gradient(#ffffff, #ffffff),
-    conic-gradient(from 0deg, #2ecc71, #f1c40f, #3498db, #2ecc71);
-  /* animate the conic by rotating the element that only contains the border using CSS variable */
-  transition: box-shadow 160ms ease, transform 160ms ease;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-  font-size: 16px;
-}
-
-/* faux-rotation via background-position (limited) */
-@keyframes wobble {
-  0%   { background-position: 0% 50%; }
-  50%  { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
-#room-code-input{
-  background-size: 200% 200%, 200% 200%;
-  animation: wobble 6s linear infinite;
-}
-
-/* focus glow: stop wobble visually and add glow */
-#room-code-input:focus{
-  animation-play-state: paused;
-  box-shadow:
-    0 8px 30px rgba(46,204,113,0.18),
-    0 0 22px rgba(52,152,219,0.18);
-  transform: translateY(-1px);
-  outline: none;
-}
-
-.rotating-border {
-  position: relative;
-  display: inline-block;
-  padding: 4px; /* border thickness */
-  border-radius: 12px;
-  overflow: hidden;
-}
-
-.rotating-border::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  padding: 4px;
-  background: conic-gradient(
-    from 0deg,
-    #2ecc71,
-    #f1c40f,
-    #3498db,
-    #2ecc71
-  );
-  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  animation: spin 3s linear infinite;
-  z-index: 0;
-}
-
-.rotating-border input#room-code-input {
-  position: relative;
-  z-index: 1;
-  width: 320px;
-  padding: 12px 14px;
-  border: none;
-  outline: none;
-  border-radius: 8px;
-  background: #fff;
-  font-size: 16px;
-  transition: box-shadow 0.25s ease;
-}
-
-/* Glowing focus effect */
-.rotating-border:focus-within::before {
-  filter: brightness(1.3) blur(4px);
-  animation-play-state: paused; /* pause rotation while glowing */
-}
-
-.rotating-border input#room-code-input:focus {
-  box-shadow: 0 0 15px 4px rgba(46, 204, 113, 0.4),
-              0 0 25px 8px rgba(52, 152, 219, 0.2);
-}
-
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to   { transform: rotate(360deg); }
-}
-
-/* Footer */
-footer {
-    position: static;
-    bottom: 0;
-    width: 100%;
-    text-align: center;
-    padding: 15px;
-    height: 60px;
-    background: #2b2d42;
-    color: #fff;
-}
-
-</style>
+    /* Modal */
+    .modal {
+      display: none; position: fixed; top: 0; left: 0;
+      width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6);
+      justify-content: center; align-items: center; z-index: 1000;
+    }
+    .modal-content {
+      background: #fff; border-radius: 10px;
+      padding: 30px 40px; text-align: center;
+      width: 360px; box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+      position: relative;
+    }
+    .modal-content h2 { margin-bottom: 20px; color: #2b2d42; }
+    .modal-content input {
+      width: 100%; padding: 10px; margin-bottom: 10px;
+      border-radius: 6px; border: 1px solid #ccc; font-size: 16px;
+    }
+    .modal-content button {
+      width: 100%; margin-top: 8px; padding: 10px;
+      border: none; border-radius: 6px; background: #2b2d42;
+      color: #fff; font-weight: bold; cursor: pointer; transition: 0.3s;
+    }
+    .modal-content button:hover { background: #1d1f2e; }
+    .google-btn { background: #db4437 !important; color: white; }
+    .close-btn {
+      position: absolute; top: 10px; right: 15px;
+      font-size: 20px; cursor: pointer; color: #666;
+    }
+  </style>
+</head>
 <body>
-    <header>
-        <div class="logo">DudeStream</div>
-        <nav>
-            <a href="#">Home</a>
-            <a href="#">Login</a>
-            <a href="#">Register</a>
-        </nav>
-    </header>
+  <header>
+    <div class="logo">DudeStream</div>
+    <nav>
+      <button id="login-btn">Login</button>
+      <button id="register-btn">Register</button>
+      <img id="profile-img" src="#" alt="Profile" />
+      <div id="profile-menu">
+        <p id="user-name">Hi, User 👋</p>
+        <button id="logout-btn">Logout</button>
+      </div>
+    </nav>
+  </header>
 
-    <section class="hero">
-        <h1>Share & View Stream Together</h1>
-        <p>Invite friends to a room, share an image, and collaborate in real-time.</p>
-            <!-- <input type="text" id="room-code-input" placeholder="Enter Room Code"> -->
-             
-        <div class="buttons">
-            <button class="btn" id="create-room-button"><p>Create Room</p></button>
-            <!-- <br> -->
-            <p>---------------------------------------------</p>
-            <div class="rotating-border">
-                <input id="room-code-input" type="text" placeholder="Enter room code" />
-            </div>
-             <br>
-            <!-- <a href="{%url 'core:create'%}" class="btn"></a> -->
-            <button class="btn" id="join-room-button"><p>Join Room</p></button>
-        </div>
-    </section>
+  <section class="hero">
+    <h1>Share & View Stream Together</h1>
+    <p>Invite friends to a room, share an image, and collaborate in real-time.</p>
+    <div class="buttons">
+      <button class="btn" id="create-room-button"><p>Create Room</p></button>
+      <p>---------------------------------------------</p>
+      <div class="rotating-border">
+        <input id="room-code-input" type="text" placeholder="Enter room code" />
+      </div>
+      <br />
+      <button class="btn" id="join-room-button"><p>Join Room</p></button>
+    </div>
+  </section>
 
-    <footer>
-        <p>© 2025 CollabView. All rights reserved.</p>
-    </footer>
-</body>
-<script>
-    // Get the input field and the button
-    const roomCodeInput = document.getElementById('room-code-input');
-    const joinButton = document.getElementById('join-room-button');
-    const createButton = document.getElementById('create-room-button');
+  <footer><p>© 2025 CollabView. All rights reserved.</p></footer>
 
-    // Add an event listener for when the create button is clicked
-    createButton.addEventListener('click', () => {
-        // Redirect the user to the create room URL
-        window.location.href = `/room/`;
+  <!-- Login/Register Modal -->
+  <div id="auth-modal" class="modal">
+    <div class="modal-content">
+      <span class="close-btn">&times;</span>
+      <h2 id="modal-title">Login</h2>
+      <input type="email" id="email-input" placeholder="Email" required />
+      <input type="password" id="password-input" placeholder="Password" required />
+      <button id="auth-action-btn">Login</button>
+      <button id="google-login-btn" class="google-btn">Continue with Google</button>
+    </div>
+  </div>
+
+  <!-- Firebase Auth -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
+    import {
+      getAuth, GoogleAuthProvider, signInWithPopup,
+      signInWithEmailAndPassword, createUserWithEmailAndPassword,
+      onAuthStateChanged, signOut
+    } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCS7UVU0ndureoeLPjc39T_YHGHha3PK7E",
+      authDomain: "dudestream-e4776.firebaseapp.com",
+      projectId: "dudestream-e4776",
+      storageBucket: "dudestream-e4776.firebasestorage.app",
+      messagingSenderId: "555908366737",
+      appId: "1:555908366737:web:7ea684bae7c55fd53a9a30",
+      measurementId: "G-4SVN1MWBXC"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const provider = new GoogleAuthProvider();
+
+    // Elements
+    const loginBtn = document.getElementById("login-btn");
+    const registerBtn = document.getElementById("register-btn");
+    const profileImg = document.getElementById("profile-img");
+    const profileMenu = document.getElementById("profile-menu");
+    const userName = document.getElementById("user-name");
+    const logoutBtn = document.getElementById("logout-btn");
+
+    const modal = document.getElementById("auth-modal");
+    const modalTitle = document.getElementById("modal-title");
+    const emailInput = document.getElementById("email-input");
+    const passwordInput = document.getElementById("password-input");
+    const authActionBtn = document.getElementById("auth-action-btn");
+    const googleBtn = document.getElementById("google-login-btn");
+
+    let isLogin = true;
+
+    loginBtn.addEventListener("click", () => {
+      isLogin = true;
+      modalTitle.textContent = "Login";
+      authActionBtn.textContent = "Login";
+      modal.style.display = "flex";
     });
-    // Add an event listener for when the button is clicked
-    joinButton.addEventListener('click', () => {
-        const roomName = roomCodeInput.value;
 
-        // Check if the user actually typed something
-        if (roomName) {
-            // Redirect the user to the correct join room URL
-            window.location.href = `/join_room/${roomName}/`;
-        } else {
-            alert("Please enter a room code.");
+    registerBtn.addEventListener("click", () => {
+      isLogin = false;
+      modalTitle.textContent = "Register";
+      authActionBtn.textContent = "Register";
+      modal.style.display = "flex";
+    });
+
+    document.querySelector(".close-btn").addEventListener("click", () => modal.style.display = "none");
+    window.addEventListener("click", (e) => { if (e.target === modal) modal.style.display = "none"; });
+
+    // Email/Password Auth
+    authActionBtn.addEventListener("click", async () => {
+        const email = emailInput.value.trim();
+        const password = passwordInput.value.trim();
+        if (!email || !password) return alert("Enter email and password");
+        try {
+            if (isLogin) await signInWithEmailAndPassword(auth, email, password);
+            else{
+                if(password.length<8) return alert("Password should be at least 6 characters long");
+                // try{
+                await createUserWithEmailAndPassword(auth, email, password);
+                return;
+            }
+            modal.style.display = "none";
+        } 
+        catch (err) { 
+                if(err.code ==="Firebase: Error (auth/email-already-in-use).") return signInWithEmailAndPassword(auth, email, password);
+                alert("Error: " + err.message);
         }
     });
-</script>
+
+    // Google Login
+    googleBtn.addEventListener("click", async () => {
+      try {
+        await signInWithPopup(auth, provider);
+        modal.style.display = "none";
+      } catch (err) { alert("Google login failed: " + err.message); }
+    });
+
+    // Auth State
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        loginBtn.style.display = "none";
+        registerBtn.style.display = "none";
+        profileImg.style.display = "inline-block";
+        profileImg.src = user.photoURL || "https://via.placeholder.com/40";
+        userName.textContent = `Hi, ${user.displayName || user.email.split('@')[0]} 👋`;
+      } else {
+        loginBtn.style.display = "inline-block";
+        registerBtn.style.display = "inline-block";
+        profileImg.style.display = "none";
+        profileMenu.classList.remove("show");
+      }
+    });
+
+    // Toggle menu & logout
+    profileImg.addEventListener("click", () => profileMenu.classList.toggle("show"));
+    logoutBtn.addEventListener("click", async () => { await signOut(auth); profileMenu.classList.remove("show"); });
+
+    // Room Logic
+    if(user){
+        const roomCodeInput = document.getElementById("room-code-input");
+        document.getElementById("create-room-button").addEventListener("click", () => window.location.href = `/room/`);
+        document.getElementById("join-room-button").addEventListener("click", () => {
+        const roomName = roomCodeInput.value.trim();
+        if (roomName) window.location.href = `/join_room/${roomName}/`;
+        else alert("Please enter a room code.");
+        });
+    }
+    else{
+        document.getElementById("create-room-button").addEventListener("click", () => alert("Please login to create a room."));
+        document.getElementById("join-room-button").addEventListener("click", () => alert("Please login to join a room."));
+    }
+  </script>
+</body>
 </html>
