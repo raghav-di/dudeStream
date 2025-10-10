@@ -61,7 +61,7 @@
     .hero {
       text-align: center; padding: 80px 20px;
       background: linear-gradient(135deg, #7ffc11c6, #ffbe0b9e, rgba(47, 0, 255, 0.84));
-      color: #fff; min-height: calc(100vh - 130px);
+      color: #fff; min-height: calc(100vh - 80px);
     }
     .hero h1 { font-size: 2.5rem; margin-bottom: 15px; }
     .hero p { font-size: 1.1rem; margin-bottom: 30px; }
@@ -131,35 +131,177 @@
       position: absolute; top: 10px; right: 15px;
       font-size: 20px; cursor: pointer; color: #666;
     }
+    /* About Section */
+    .about-section {
+    background: #ffffff;
+    padding: 80px 20px;
+    text-align: center;
+    color: #2b2d42;
+    position: relative;
+    overflow: hidden;
+    }
+
+    .about-section::before {
+    content: "";
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(135deg, rgba(127, 252, 17, 0.15), rgba(255, 190, 11, 0.15), rgba(47, 0, 255, 0.15));
+    transform: rotate(10deg);
+    z-index: 0;
+    }
+
+    .about-section h2 {
+    font-size: 2.2rem;
+    margin-bottom: 10px;
+    z-index: 1;
+    position: relative;
+    }
+
+    .about-section .subtitle {
+    font-size: 1.1rem;
+    color: #555;
+    margin-bottom: 50px;
+    z-index: 1;
+    position: relative;
+    }
+
+    .about-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 30px;
+    max-width: 1100px;
+    margin: 0 auto 50px;
+    z-index: 1;
+    position: relative;
+    }
+
+    .about-card {
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+    padding: 30px 20px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    }
+
+    .about-card::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%;
+    height: 6px;
+    background: linear-gradient(90deg, #2ecc71, #f1c40f, #3498db);
+    }
+
+    .about-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    }
+
+    .about-card .icon {
+    font-size: 2.5rem;
+    margin-bottom: 15px;
+    }
+
+    .about-card h3 {
+    font-size: 1.2rem;
+    color: #2b2d42;
+    margin-bottom: 10px;
+    }
+
+    .about-card p {
+    color: #555;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    }
+
+    /* Explore Button */
+    .explore-btn {
+    background: linear-gradient(90deg, #2ecc71, #f1c40f, #3498db);
+    border: none;
+    color: white;
+    font-size: 1.1rem;
+    padding: 12px 28px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    transition: all 0.3s ease;
+    z-index: 1;
+    position: relative;
+    }
+
+    .explore-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+    }
   </style>
 </head>
 <body>
-  <header>
-    <div class="logo">DudeStream</div>
-    <nav>
-      <button id="login-btn">Login</button>
-      <button id="register-btn">Register</button>
-      <img id="profile-img" src="#" alt="Profile" />
-      <div id="profile-menu">
-        <p id="user-name">Hi, User 👋</p>
-        <button id="logout-btn">Logout</button>
-      </div>
-    </nav>
-  </header>
+    <header>
+        <div class="logo">DudeStream</div>
+        <nav>
+        <button id="login-btn">Login</button>
+        <button id="register-btn">Register</button>
+        <img id="profile-img" src="#" alt="Profile" />
+        <div id="profile-menu">
+            <p id="user-name">Hi, User 👋</p>
+            <button id="logout-btn">Logout</button>
+        </div>
+        </nav>
+    </header>
 
-  <section class="hero">
-    <h1>Share & View Stream Together</h1>
-    <p>Invite friends to a room, share an image, and collaborate in real-time.</p>
-    <div class="buttons">
-      <button class="btn" id="create-room-button"><p>Create Room</p></button>
-      <p>---------------------------------------------</p>
-      <div class="rotating-border">
-        <input id="room-code-input" type="text" placeholder="Enter room code" />
-      </div>
-      <br />
-      <button class="btn" id="join-room-button"><p>Join Room</p></button>
+    <section class="hero">
+        <h1>Share & View Stream Together</h1>
+        <p>Invite friends to a room, share an image, and collaborate in real-time.</p>
+        <div class="buttons">
+        <button class="btn" id="create-room-button"><p>Create Room</p></button>
+        <p>---------------------------------------------</p>
+        <div class="rotating-border">
+            <input id="room-code-input" type="text" placeholder="Enter room code" />
+        </div>
+        <br />
+        <button class="btn" id="join-room-button"><p>Join Room</p></button>
+        </div>
+    </section>
+  
+    <!-- About / How It Works Section -->
+    <div class="about-section">
+    <h2>How CollabView Works</h2>
+    <p class="subtitle">Connect, collaborate, and stream together — all in one place.</p>
+
+    <div class="about-cards">
+        <div class="about-card">
+        <div class="icon">👥</div>
+        <h3>1. Create or Join a Room</h3>
+        <p>Easily start a room or join an existing one using a unique room code. No complicated setup — just click and go!</p>
+        </div>
+
+        <div class="about-card">
+        <div class="icon">🎥</div>
+        <h3>2. Share and Watch Together</h3>
+        <p>Stream videos in real-time with your friends. Everyone stays synced, seeing the same frame — just like a virtual cinema!</p>
+        </div>
+
+        <div class="about-card">
+        <div class="icon">💬</div>
+        <h3>3. Collaborate in Real-Time</h3>
+        <p>Chat, react, and share thoughts instantly while watching. Build meaningful interactions while enjoying your content.</p>
+        </div>
+
+        <div class="about-card">
+        <div class="icon">🔒</div>
+        <h3>4. Secure Login</h3>
+        <p>Authenticate with Google or Email securely. Your account, your control — powered by Firebase Authentication.</p>
+        </div>
     </div>
-  </section>
+
+    <button class="explore-btn" id="explore-btn">Get Started 🚀</button>
+    </div>
 
   <footer><p>© 2025 CollabView. All rights reserved.</p></footer>
 
@@ -212,7 +354,11 @@
     const passwordInput = document.getElementById("password-input");
     const authActionBtn = document.getElementById("auth-action-btn");
     const googleBtn = document.getElementById("google-login-btn");
+    const createRoomBtn = document.getElementById("create-room-button");
+    const joinRoomBtn = document.getElementById("join-room-button");
+    const roomCodeInput = document.getElementById("room-code-input");
 
+    let loginState = null;
     let isLogin = true;
 
     loginBtn.addEventListener("click", () => {
@@ -263,18 +409,20 @@
 
     // Auth State
     onAuthStateChanged(auth, (user) => {
-      if (user) {
-        loginBtn.style.display = "none";
-        registerBtn.style.display = "none";
-        profileImg.style.display = "inline-block";
-        profileImg.src = user.photoURL || "https://via.placeholder.com/40";
-        userName.textContent = `Hi, ${user.displayName || user.email.split('@')[0]} 👋`;
-      } else {
-        loginBtn.style.display = "inline-block";
-        registerBtn.style.display = "inline-block";
-        profileImg.style.display = "none";
-        profileMenu.classList.remove("show");
-      }
+        if (user) {
+            loginBtn.style.display = "none";
+            registerBtn.style.display = "none";
+            profileImg.style.display = "inline-block";
+            profileImg.src = user.photoURL || "https://via.placeholder.com/40";
+            userName.textContent = `Hi, ${user.displayName || user.email.split('@')[0]} 👋`;
+            enableRoomActions(true);
+        } else {
+            loginBtn.style.display = "inline-block";
+            registerBtn.style.display = "inline-block";
+            profileImg.style.display = "none";
+            profileMenu.classList.remove("show");
+            enableRoomActions(false);
+        }
     });
 
     // Toggle menu & logout
@@ -282,19 +430,23 @@
     logoutBtn.addEventListener("click", async () => { await signOut(auth); profileMenu.classList.remove("show"); });
 
     // Room Logic
-    if(user){
-        const roomCodeInput = document.getElementById("room-code-input");
-        document.getElementById("create-room-button").addEventListener("click", () => window.location.href = `/room/`);
-        document.getElementById("join-room-button").addEventListener("click", () => {
-        const roomName = roomCodeInput.value.trim();
-        if (roomName) window.location.href = `/join_room/${roomName}/`;
-        else alert("Please enter a room code.");
-        });
+    function enableRoomActions(isLoggedIn) {
+        createRoomBtn.onclick = () => {
+            if (!isLoggedIn) return alert("Please login to create a room.");
+            window.location.href = `/room/`;
+        };
+
+        joinRoomBtn.onclick = () => {
+            if (!isLoggedIn) return alert("Please login to join a room.");
+            const roomName = roomCodeInput.value.trim();
+            if (roomName) window.location.href = `/join_room/${roomName}/`;
+            else alert("Please enter a room code.");
+        };
     }
-    else{
-        document.getElementById("create-room-button").addEventListener("click", () => alert("Please login to create a room."));
-        document.getElementById("join-room-button").addEventListener("click", () => alert("Please login to join a room."));
-    }
+  // Smooth scroll to top of hero section when clicking Explore
+  document.getElementById("explore-btn").addEventListener("click", () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  });
   </script>
 </body>
 </html>
