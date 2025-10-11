@@ -327,13 +327,13 @@
     } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
 
     const firebaseConfig = {
-      apiKey: "AIzaSyCS7UVU0ndureoeLPjc39T_YHGHha3PK7E",
-      authDomain: "dudestream-e4776.firebaseapp.com",
-      projectId: "dudestream-e4776",
-      storageBucket: "dudestream-e4776.firebasestorage.app",
-      messagingSenderId: "555908366737",
-      appId: "1:555908366737:web:7ea684bae7c55fd53a9a30",
-      measurementId: "G-4SVN1MWBXC"
+      apiKey: "{{ apiKey }}",
+      authDomain: "{{ authDomain }}",
+      projectId: "{{ projectId }}",
+      storageBucket: "{{ storageBucket }}",
+      messagingSenderId: "{{ messagingSenderId }}",
+      appId: "{{ appId }}",
+      measurementId: "{{ measurementId }}"
     };
 
     const app = initializeApp(firebaseConfig);
