@@ -314,6 +314,7 @@
       <input type="password" id="password-input" placeholder="Password" required />
       <button id="auth-action-btn">Login</button>
       <button id="google-login-btn" class="google-btn">Continue with Google</button>
+    <button id="forgot-password-btn" style="margin-top: 10px; background: #555;">Forgot Password</button>
     </div>
   </div>
 
@@ -323,7 +324,7 @@
     import {
       getAuth, GoogleAuthProvider, signInWithPopup,
       signInWithEmailAndPassword, createUserWithEmailAndPassword,
-      onAuthStateChanged, signOut
+      onAuthStateChanged, signOut, sendPasswordResetEmail
     } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
 
     const firebaseConfig = {
@@ -443,6 +444,23 @@
             else alert("Please enter a room code.");
         };
     }
+
+  // Example: user clicks "Forgot Password"
+  async function forgotPassword() {
+      const email = prompt("Enter your email to reset password:");
+      if (!email) return alert("Please enter a valid email");
+
+      try {
+          await sendPasswordResetEmail(auth, email);
+          alert("Password reset email sent! Check your inbox.");
+      } catch (err) {
+          alert("Error: " + err.message);
+      }
+  }
+
+  // Attach to a button
+  document.getElementById("forgot-password-btn").addEventListener("click", forgotPassword);
+
   // Smooth scroll to top of hero section when clicking Explore
   document.getElementById("explore-btn").addEventListener("click", () => {
     window.scrollTo({ top: 0, behavior: "smooth" });

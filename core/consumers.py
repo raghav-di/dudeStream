@@ -15,6 +15,10 @@ class SignalingConsumer(AsyncWebsocketConsumer):
     async def receive(self, text_data):
         data = json.loads(text_data)
         
+        # # Allow only Streamer <-> Viewer communication
+        # if not self.scope['user'].is_streamer and 'target' in data:
+        #     # Block direct viewer-to-viewer signaling
+        #     return
         # If a message has a 'target', send it directly to that channel
         if 'target' in data:
             target_channel_name = data['target']
